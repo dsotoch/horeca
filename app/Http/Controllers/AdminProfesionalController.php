@@ -34,6 +34,7 @@ class AdminProfesionalController extends Controller
             ->paginate(100)
             ->withQueryString();
 
+            
         $totalProfesionales = Profesional::count();
 
         return view(

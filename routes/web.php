@@ -105,21 +105,21 @@ Route::middleware(['auth'])
 
 
 
-       // PROFESIONALES
-Route::get('/profesionales', [
-    AdminProfesionalController::class,
-    'index'
-])->name('profesionales.index');
+        // PROFESIONALES
+        Route::get('/profesionales', [
+            AdminProfesionalController::class,
+            'index'
+        ])->name('profesionales.index');
 
-Route::get('/profesionales/{profesional}', [
-    AdminProfesionalController::class,
-    'show'
-])->name('profesionales.show');
+        Route::get('/profesionales/{profesional}', [
+            AdminProfesionalController::class,
+            'show'
+        ])->name('profesionales.show');
 
-Route::patch('/profesionales/{profesional}/estado', [
-    AdminProfesionalController::class,
-    'cambiarEstado'
-])->name('profesionales.estado');
+        Route::patch('/profesionales/{profesional}/estado', [
+            AdminProfesionalController::class,
+            'cambiarEstado'
+        ])->name('profesionales.estado');
 
 
 
@@ -128,11 +128,24 @@ Route::patch('/profesionales/{profesional}/estado', [
             'index'
         ])->name('oportunidades.index');
 
-        Route::get('/postulaciones', [
-            AdminPostulacionController::class,
-            'index'
-        ])->name('postulaciones.index');
+        Route::get('/oportunidades/{oportunidad}', [
+            AdminOportunidadController::class,
+            'show'
+        ])->name('oportunidades.show');
 
+        Route::patch('/oportunidades/{oportunidad}/estado', [
+            AdminOportunidadController::class,
+            'cambiarEstado'
+        ])->name('oportunidades.estado');
+
+
+
+
+
+
+
+
+        
         Route::get('/usuarios', [
             AdminUsuarioController::class,
             'index'

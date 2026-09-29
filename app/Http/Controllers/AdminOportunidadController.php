@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Oportunidad;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminOportunidadController extends Controller
 {
@@ -12,6 +13,7 @@ class AdminOportunidadController extends Controller
      */
     public function index(Request $request)
     {
+        $usuario=Auth::user();
         $buscar = $request->input('buscar');
         $estado = $request->input('estado');
 
@@ -39,7 +41,7 @@ class AdminOportunidadController extends Controller
             })
 
             ->latest()
-            ->paginate(15)
+            ->paginate(100)
             ->withQueryString();
 
         /*
@@ -69,7 +71,8 @@ class AdminOportunidadController extends Controller
             'totalOportunidades',
             'publicadas',
             'cerradas',
-            'totalPostulaciones'
+            'totalPostulaciones',
+            'usuario'
         ));
     }
 
@@ -78,6 +81,7 @@ class AdminOportunidadController extends Controller
      */
     public function show(Oportunidad $oportunidad)
     {
+        $usuario=Auth::user();
         $oportunidad->load([
             'empresa',
             'postulaciones.profesional.user',
@@ -85,7 +89,7 @@ class AdminOportunidadController extends Controller
 
         return view(
             'admin.oportunidades.show',
-            compact('oportunidad')
+            compact('oportunidad','usuario')
         );
     }
 

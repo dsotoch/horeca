@@ -40,7 +40,7 @@ class ProfesionalController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            ->where('estado_validacion', 'aprobado')
+            ->whereIn('estado_validacion', ['aprobado','pendiente'])
 
 
             /*
@@ -126,7 +126,7 @@ class ProfesionalController extends Controller
 
         $especialidades = Profesional::query()
 
-            ->where('estado_validacion', 'aprobado')
+            ->whereIn('estado_validacion', ['aprobado','pendiente'])
 
             ->whereNotNull('especialidad')
 
@@ -147,7 +147,7 @@ class ProfesionalController extends Controller
 
         $ciudades = Profesional::query()
 
-            ->where('estado_validacion', 'aprobado')
+            ->whereIn('estado_validacion', ['aprobado','pendiente'])
 
             ->whereNotNull('ciudad')
 
@@ -168,7 +168,7 @@ class ProfesionalController extends Controller
 
         $modalidades = Profesional::query()
 
-            ->where('estado_validacion', 'aprobado')
+            ->whereIn('estado_validacion', ['aprobado','pendiente'])
 
             ->whereNotNull('modalidad')
 
@@ -206,10 +206,7 @@ class ProfesionalController extends Controller
         $profesional->load('user');
         $usuario=Auth::user();
 
-        abort_unless(
-            $profesional->estado_validacion === 'aprobado',
-            404
-        );
+      
 
         return view(
             'profesionales.show',
