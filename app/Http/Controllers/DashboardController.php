@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
+use App\Models\Oportunidad;
+use App\Models\Postulacion;
+use App\Models\Profesional;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +15,202 @@ use Illuminate\Validation\Rule;
 
 class DashboardController extends Controller
 {
+
+    public function actualizarEmpresa(Request $request)
+    {
+        $usuario = auth()->user();
+
+        $empresa = Empresa::where('user_id', $usuario->id)->firstOrFail();
+
+        $validated = $request->validate([
+            'razon_social' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'nombre_comercial' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'ruc' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('empresas', 'ruc')->ignore($empresa->id),
+            ],
+
+            'tipo_empresa' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'sitio_web' => [
+                'nullable',
+                'url',
+                'max:255',
+            ],
+
+            'red_social' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'contacto_nombres' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'contacto_apellidos' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+
+            'cargo' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+
+            'celular' => [
+                'required',
+                'string',
+                'max:30',
+            ],
+
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+            ],
+
+            'departamento' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'ciudad' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'distrito' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'direccion' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'perfiles_busca' => [
+                'nullable',
+                'string',
+            ],
+
+            'tipo_contratacion' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'cantidad_profesionales' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
+
+            'descripcion' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+
+            'video_presentacion' => [
+                'nullable',
+                'file',
+                'mimes:mp4,mov,avi,webm',
+                'max:51200',
+            ],
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Actualizar datos de la empresa
+    |--------------------------------------------------------------------------
+    */
+
+        $empresa->razon_social = $validated['razon_social'];
+        $empresa->nombre_comercial = $validated['nombre_comercial'] ?? null;
+        $empresa->ruc = $validated['ruc'];
+        $empresa->tipo_empresa = $validated['tipo_empresa'];
+        $empresa->sitio_web = $validated['sitio_web'] ?? null;
+        $empresa->red_social = $validated['red_social'] ?? null;
+
+        $empresa->contacto_nombres = $validated['contacto_nombres'];
+        $empresa->contacto_apellidos = $validated['contacto_apellidos'];
+        $empresa->cargo = $validated['cargo'] ?? null;
+        $empresa->celular = $validated['celular'];
+
+        $empresa->departamento = $validated['departamento'] ?? null;
+        $empresa->ciudad = $validated['ciudad'] ?? null;
+        $empresa->distrito = $validated['distrito'] ?? null;
+        $empresa->direccion = $validated['direccion'] ?? null;
+
+        $empresa->perfiles_busca = $validated['perfiles_busca'] ?? null;
+        $empresa->tipo_contratacion = $validated['tipo_contratacion'] ?? null;
+        $empresa->cantidad_profesionales = $validated['cantidad_profesionales'] ?? null;
+
+        $empresa->descripcion = $validated['descripcion'] ?? null;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Email
+    |--------------------------------------------------------------------------
+    */
+
+        if (!empty($validated['email'])) {
+            $empresa->email = $validated['email'];
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Video de presentación
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->hasFile('video_presentacion')) {
+
+            // Eliminar video anterior
+            if (!empty($empresa->video_presentacion)) {
+                Storage::disk('public')->delete(
+                    $empresa->video_presentacion
+                );
+            }
+
+            // Guardar nuevo video
+            $empresa->video_presentacion = $request
+                ->file('video_presentacion')
+                ->store('empresas/videos', 'public');
+        }
+
+        $empresa->save();
+
+        return redirect()
+            ->back()
+            ->with('success', 'El perfil de la empresa se actualizó correctamente.');
+    }
 
 
     public function index()
@@ -147,7 +348,71 @@ class DashboardController extends Controller
             'certificaciones_pendientes' => 0,
         ];
 
+        $actividadesRecientes = null;
+        if ($usuario->rol == 'profesional') {
+            $actividadesRecientes = Postulacion::with('oportunidad.empresa')
+                ->where('profesional_id', $profesional->id)
+                ->latest('fecha_postulacion')
+                ->take(5)
+                ->get()
+                ->map(function ($postulacion) {
 
+                    $empresa = $postulacion->oportunidad->empresa;
+
+                    $nombreEmpresa = $empresa->nombre_comercial
+                        ?? $empresa->razon_social
+                        ?? 'Empresa';
+
+                    return (object) [
+                        'icono' => match ($postulacion->estado) {
+                            'pendiente' => 'fa-solid fa-paper-plane',
+                            'en_revision' => 'fa-solid fa-eye',
+                            'entrevista' => 'fa-solid fa-calendar-check',
+                            'seleccionado' => 'fa-solid fa-circle-check',
+                            'descartado' => 'fa-solid fa-circle-xmark',
+                            default => 'fa-solid fa-clock',
+                        },
+
+                        'titulo' => match ($postulacion->estado) {
+                            'pendiente' => 'Postulación enviada',
+                            'en_revision' => 'Postulación en revisión',
+                            'entrevista' => 'Entrevista programada',
+                            'seleccionado' => '¡Has sido seleccionado!',
+                            'descartado' => 'Postulación finalizada',
+                            default => 'Actividad de postulación',
+                        },
+
+                        'descripcion' => match ($postulacion->estado) {
+                            'pendiente' =>
+                            'Postulaste a "' . $postulacion->oportunidad->titulo .
+                                '" en ' . $nombreEmpresa . '.',
+
+                            'en_revision' =>
+                            'Tu postulación a "' . $postulacion->oportunidad->titulo .
+                                '" está siendo revisada.',
+
+                            'entrevista' =>
+                            'Tu postulación a "' . $postulacion->oportunidad->titulo .
+                                '" pasó a etapa de entrevista.',
+
+                            'seleccionado' =>
+                            'Fuiste seleccionado para "' .
+                                $postulacion->oportunidad->titulo . '".',
+
+                            'descartado' =>
+                            'La postulación a "' .
+                                $postulacion->oportunidad->titulo .
+                                '" ha finalizado.',
+
+                            default =>
+                            'Actualización de tu postulación a "' .
+                                $postulacion->oportunidad->titulo . '".',
+                        },
+
+                        'fecha' => $postulacion->fecha_postulacion,
+                    ];
+                });
+        }
         /*
         |--------------------------------------------------------------------------
         | VISTA
@@ -161,7 +426,8 @@ class DashboardController extends Controller
                 'porcentajePerfil',
                 'iniciales',
                 'estadoValidacion',
-                'estadisticas'
+                'estadisticas',
+                'actividadesRecientes'
             ));
         } else {
             if ($usuario->rol == "empresa") {
@@ -207,11 +473,231 @@ class DashboardController extends Controller
                     'totalPostulaciones',
                     'totalContrataciones'
                 ));
-
-
+            } else {
+               return redirect()->route('admin.dashboard');
             }
         }
     }
+
+    public function admin()
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | Totales
+        |--------------------------------------------------------------------------
+        */
+
+        $totalUsuarios = User::count();
+
+        $totalEmpresas = Empresa::count();
+
+        $empresasValidadas = Empresa::where(
+            'estado_validacion',
+            'validado'
+        )->count();
+
+        $empresasPendientes = Empresa::where(
+            'estado_validacion',
+            'pendiente'
+        )->count();
+
+        $totalProfesionales = Profesional::count();
+
+        $totalOportunidades = Oportunidad::count();
+
+        $oportunidadesPublicadas = Oportunidad::where(
+            'estado',
+            'publicada'
+        )->count();
+
+        $totalPostulaciones = Postulacion::count();
+
+        $postulacionesPendientes = Postulacion::where(
+            'estado',
+            'pendiente'
+        )->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Actividades recientes
+        |--------------------------------------------------------------------------
+        */
+
+        $actividadesRecientes = collect();
+
+
+        // Empresas registradas
+        Empresa::latest()
+            ->take(5)
+            ->get()
+            ->each(function ($empresa) use ($actividadesRecientes) {
+
+                $nombre = $empresa->nombre_comercial
+                    ?? $empresa->razon_social
+                    ?? 'Empresa';
+
+                $actividadesRecientes->push((object) [
+                    'tipo' => 'empresa',
+                    'icono' => 'fa-solid fa-building',
+                    'titulo' => 'Nueva empresa registrada',
+                    'descripcion' => $nombre,
+                    'fecha' => $empresa->created_at,
+                ]);
+            });
+
+
+        // Profesionales registrados
+        Profesional::with('user')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->each(function ($profesional) use ($actividadesRecientes) {
+
+                $nombre = $profesional->user->name
+                    ?? 'Profesional';
+
+                $actividadesRecientes->push((object) [
+                    'tipo' => 'profesional',
+                    'icono' => 'fa-solid fa-user-doctor',
+                    'titulo' => 'Nuevo profesional registrado',
+                    'descripcion' => $nombre,
+                    'fecha' => $profesional->created_at,
+                ]);
+            });
+
+
+        // Oportunidades
+        Oportunidad::with('empresa')
+            ->latest()
+            ->take(5)
+            ->get()
+            ->each(function ($oportunidad) use ($actividadesRecientes) {
+
+                $empresa = $oportunidad->empresa;
+
+                $nombreEmpresa = $empresa->nombre_comercial
+                    ?? $empresa->razon_social
+                    ?? 'Empresa';
+
+                $actividadesRecientes->push((object) [
+                    'tipo' => 'oportunidad',
+                    'icono' => 'fa-solid fa-briefcase',
+                    'titulo' => 'Nueva oportunidad publicada',
+                    'descripcion' =>
+                    $oportunidad->titulo .
+                        ' · ' .
+                        $nombreEmpresa,
+                    'fecha' => $oportunidad->created_at,
+                ]);
+            });
+
+
+        // Postulaciones
+        Postulacion::with([
+            'profesional.user',
+            'oportunidad.empresa',
+        ])
+            ->latest('fecha_postulacion')
+            ->take(5)
+            ->get()
+            ->each(function ($postulacion) use ($actividadesRecientes) {
+
+                $profesional = $postulacion->profesional;
+
+                $nombreProfesional =
+                    $profesional?->user?->name
+                    ?? 'Profesional';
+
+                $titulo =
+                    $postulacion->oportunidad?->titulo
+                    ?? 'Oportunidad';
+
+                $actividadesRecientes->push((object) [
+                    'tipo' => 'postulacion',
+                    'icono' => 'fa-solid fa-paper-plane',
+                    'titulo' => 'Nueva postulación',
+                    'descripcion' =>
+                    $nombreProfesional .
+                        ' postuló a "' .
+                        $titulo .
+                        '"',
+                    'fecha' => $postulacion->fecha_postulacion,
+                ]);
+            });
+
+
+        $actividadesRecientes = $actividadesRecientes
+            ->sortByDesc('fecha')
+            ->take(10)
+            ->values();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Empresas pendientes de validación
+        |--------------------------------------------------------------------------
+        */
+
+        $empresasPorValidar = Empresa::where(
+            'estado_validacion',
+            'pendiente'
+        )
+            ->latest()
+            ->take(5)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Últimas postulaciones
+        |--------------------------------------------------------------------------
+        */
+
+        $ultimasPostulaciones = Postulacion::with([
+            'profesional.user',
+            'oportunidad.empresa',
+        ])
+            ->latest('fecha_postulacion')
+            ->take(8)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Datos para gráfico
+        |--------------------------------------------------------------------------
+        */
+
+        $postulacionesPorEstado = Postulacion::select(
+            'estado',
+            DB::raw('COUNT(*) as total')
+        )
+            ->groupBy('estado')
+            ->pluck('total', 'estado');
+
+      $usuario=Auth::user();
+        return view(
+            'dashboard.admin',
+            compact(
+                'totalUsuarios',
+                'totalEmpresas',
+                'empresasValidadas',
+                'empresasPendientes',
+                'totalProfesionales',
+                'totalOportunidades',
+                'oportunidadesPublicadas',
+                'totalPostulaciones',
+                'postulacionesPendientes',
+                'actividadesRecientes',
+                'empresasPorValidar',
+                'ultimasPostulaciones',
+                'postulacionesPorEstado',
+                'usuario'
+            )
+        );
+    }
+
     public function perfil()
     {
         $usuario = Auth::user();
@@ -223,7 +709,17 @@ class DashboardController extends Controller
             'profesional'
         ));
     }
+    public function perfilEmpresa()
+    {
+        $usuario = Auth::user();
 
+        $empresa = $usuario->empresa;
+
+        return view('dashboard.perfil-empresa', compact(
+            'usuario',
+            'empresa'
+        ));
+    }
 
     public function actualizarPerfil(Request $request)
     {

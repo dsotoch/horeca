@@ -151,7 +151,7 @@
                 {{-- ================================================= --}}
                 {{-- USUARIO / MEMBRESÍA --}}
                 {{-- ================================================= --}}
-
+                @if(auth()->user()->rol !='admin')
                 <div class="px-5 pb-6">
 
                     <div
@@ -209,7 +209,8 @@
                         <div class="flex gap-2 mt-4">
 
                             <a
-                                href="#"
+                                href="{{ auth()->user()->rol=='profesional'? route('perfil.profesional') : route('perfil.empresa')}}"
+
                                 class="
                                     flex-1
                                     rounded-xl
@@ -228,30 +229,12 @@
                             </a>
 
 
-                            <a
-                                href="#"
-                                class="
-                                    rounded-xl
-                                    bg-horeca-dorado
-                                    px-4
-                                    py-2
-                                    text-xs
-                                    font-bold
-                                    text-black
-                                    hover:opacity-90
-                                    transition
-                                ">
-
-                                ★ Pagar
-
-                            </a>
-
                         </div>
 
                     </div>
 
                 </div>
-
+                @endif
 
 
                 {{-- ================================================= --}}
@@ -278,6 +261,8 @@
 
                     <nav class="space-y-1.5">
 
+
+                        @if(auth()->user()->rol !='admin')
                         {{-- ========================================================= --}}
                         {{-- INICIO --}}
                         {{-- ========================================================= --}}
@@ -296,8 +281,6 @@
 
 
                         </a>
-
-
                         {{-- ========================================================= --}}
                         {{-- OPORTUNIDADES --}}
                         {{-- ========================================================= --}}
@@ -345,7 +328,7 @@
                         {{-- DIRECTORIO --}}
                         {{-- ========================================================= --}}
 
-                        <a 
+                        <a
                             href="{{route('directorio.empresas.index')}}"
                             class=" {{ request()->routeIs('directorio.empresas.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }}  group flex items-center rounded-xl px-4 py-3 text-sm font-semibold flex items-center justify-between text-white/60 transition hover:bg-white/5 hover:text-white">
                             <span class="flex items-center gap-3">
@@ -402,14 +385,14 @@
                         {{-- ========================================================= --}}
 
                         <a
-                            href="{{ route('perfil.profesional') }}"
-                            class="{{ request()->routeIs('perfil.profesional') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }} group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-white/60 transition hover:bg-white/5 hover:text-white">
+                            href="{{ auth()->user()->rol=='profesional'? route('perfil.profesional') : route('perfil.empresa')}}"
+                            class="{{ request()->routeIs('perfil.profesional')  || request()->routeIs('perfil.empresa')? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }} group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-white/60 transition hover:bg-white/5 hover:text-white">
                             <span class="flex items-center gap-3">
                                 <i class="fa-solid fa-user w-5 text-center"></i>
                                 <span>Mi perfil</span>
                             </span>
 
-                            @if(request()->routeIs('perfil.profesional'))
+                            @if(request()->routeIs('perfil.profesional') || request()->routeIs('perfil.empresa'))
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                             @endif
                         </a>
@@ -448,7 +431,170 @@
                             @endif
 
                         </a>
+                        @else
 
+                        {{-- ========================================================= --}}
+                        {{-- ADMINISTRADOR --}}
+                        {{-- ========================================================= --}}
+
+
+                        {{-- ========================================================= --}}
+                        {{-- INICIO --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.dashboard') }}"
+                            class="{{ request()->routeIs('admin.dashboard') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-house w-5 text-center"></i>
+                                <span>Inicio</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.dashboard'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                        {{-- ========================================================= --}}
+                        {{-- EMPRESAS --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.empresas.index') }}"
+                            class="{{ request()->routeIs('admin.empresas.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-building w-5 text-center"></i>
+                                <span>Empresas</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.empresas.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                        {{-- ========================================================= --}}
+                        {{-- PROFESIONALES --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.profesionales.index') }}"
+                            class="{{ request()->routeIs('admin.profesionales.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-user-tie w-5 text-center"></i>
+                                <span>Profesionales</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.profesionales.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                        {{-- ========================================================= --}}
+                        {{-- OPORTUNIDADES --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.oportunidades.index') }}"
+                            class="{{ request()->routeIs('admin.oportunidades.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-briefcase w-5 text-center"></i>
+                                <span>Oportunidades</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.oportunidades.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                      
+
+                        {{-- ========================================================= --}}
+                        {{-- USUARIOS --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.usuarios.index') }}"
+                            class="{{ request()->routeIs('admin.usuarios.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-users w-5 text-center"></i>
+                                <span>Usuarios</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.usuarios.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                        {{-- ========================================================= --}}
+                        {{-- REPORTES --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.reportes.index') }}"
+                            class="{{ request()->routeIs('admin.reportes.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-chart-column w-5 text-center"></i>
+                                <span>Reportes</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.reportes.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+
+
+
+                        {{-- ========================================================= --}}
+                        {{-- CONFIGURACIÓN --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.configuracion.index') }}"
+                            class="{{ request()->routeIs('admin.configuracion.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-gear w-5 text-center"></i>
+                                <span>Configuración</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.configuracion.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+
+                        {{-- ========================================================= --}}
+                        {{-- AUDITORÍA --}}
+                        {{-- ========================================================= --}}
+
+                        <a
+                            href="{{ route('admin.auditoria.index') }}"
+                            class="{{ request()->routeIs('admin.auditoria.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : 'text-white/60 font-semibold' }}
+        group flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:bg-white/5 hover:text-white">
+                            <span class="flex items-center gap-3">
+                                <i class="fa-solid fa-shield-halved w-5 text-center"></i>
+                                <span>Auditoría</span>
+                            </span>
+
+                            @if(request()->routeIs('admin.auditoria.*'))
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                            @endif
+                        </a>
+
+                        @endif
                     </nav>
 
 

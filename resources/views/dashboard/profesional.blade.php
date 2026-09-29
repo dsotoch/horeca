@@ -50,7 +50,7 @@
             </a>
 
             <a
-                href="#"
+                href="{{route('profesional.oportunidades.index')}}"
                 class="inline-flex items-center gap-2 rounded-xl bg-horeca-dorado px-4 py-3 text-xs font-black text-black transition hover:opacity-90">
                 <i class="fa-solid fa-briefcase"></i>
                 Buscar oportunidades
@@ -758,7 +758,7 @@
 
 
             <a
-                href="#"
+                href="{{route('profesional.oportunidades.index')}}"
                 class="text-xs font-bold text-horeca-dorado">
                 Ver todas →
             </a>
@@ -1098,12 +1098,7 @@
     </div>
 
 
-    <a
-        href="#"
-        class="text-xs font-bold text-horeca-dorado">
-        Ver información de seguridad →
-    </a>
-
+ 
 </div>
 
 

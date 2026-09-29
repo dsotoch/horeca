@@ -1,5 +1,14 @@
 <?php
 
+use App\Http\Controllers\AdminAuditoriaController;
+use App\Http\Controllers\AdminConfiguracionController;
+use App\Http\Controllers\AdminDirectorioController;
+use App\Http\Controllers\AdminEmpresaController;
+use App\Http\Controllers\AdminOportunidadController;
+use App\Http\Controllers\AdminPostulacionController;
+use App\Http\Controllers\AdminProfesionalController;
+use App\Http\Controllers\AdminReporteController;
+use App\Http\Controllers\AdminUsuarioController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DirectorioController;
@@ -58,6 +67,97 @@ Route::controller(RegistroController::class)
             ->name('register.empresa.store');
     });
 
+Route::middleware(['auth'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+
+        Route::get('/dashboard', [
+            DashboardController::class,
+            'admin'
+        ])->name('dashboard');
+
+        Route::get('/empresas', [
+            AdminEmpresaController::class,
+            'index'
+        ])->name('empresas.index');
+        Route::get('/empresas/{empresa}', [
+            AdminEmpresaController::class,
+            'show'
+        ])->name('empresas.show');
+
+
+        Route::patch('/empresas/{empresa}/validar', [
+            AdminEmpresaController::class,
+            'validar'
+        ])->name('empresas.validar');
+
+        Route::patch('/empresas/{empresa}/observar', [
+            AdminEmpresaController::class,
+            'observar'
+        ])->name('empresas.observar');
+
+        Route::patch('/empresas/{empresa}/estado', [
+            AdminEmpresaController::class,
+            'cambiarEstado'
+        ])->name('empresas.estado');
+
+
+
+
+       // PROFESIONALES
+Route::get('/profesionales', [
+    AdminProfesionalController::class,
+    'index'
+])->name('profesionales.index');
+
+Route::get('/profesionales/{profesional}', [
+    AdminProfesionalController::class,
+    'show'
+])->name('profesionales.show');
+
+Route::patch('/profesionales/{profesional}/estado', [
+    AdminProfesionalController::class,
+    'cambiarEstado'
+])->name('profesionales.estado');
+
+
+
+        Route::get('/oportunidades', [
+            AdminOportunidadController::class,
+            'index'
+        ])->name('oportunidades.index');
+
+        Route::get('/postulaciones', [
+            AdminPostulacionController::class,
+            'index'
+        ])->name('postulaciones.index');
+
+        Route::get('/usuarios', [
+            AdminUsuarioController::class,
+            'index'
+        ])->name('usuarios.index');
+
+        Route::get('/reportes', [
+            AdminReporteController::class,
+            'index'
+        ])->name('reportes.index');
+
+        Route::get('/directorio', [
+            AdminDirectorioController::class,
+            'index'
+        ])->name('directorio.index');
+
+        Route::get('/configuracion', [
+            AdminConfiguracionController::class,
+            'index'
+        ])->name('configuracion.index');
+
+        Route::get('/auditoria', [
+            AdminAuditoriaController::class,
+            'index'
+        ])->name('auditoria.index');
+    });
 
 Route::middleware("auth")->controller(DashboardController::class)->prefix("portal")
     ->group(function () {
@@ -65,7 +165,8 @@ Route::middleware("auth")->controller(DashboardController::class)->prefix("porta
             ->name('dashboard');
         Route::get('/perfil', 'perfil')
             ->name('perfil.profesional');
-
+        Route::get('/perfil-empresa', 'perfilEmpresa')
+            ->name('perfil.empresa');
         Route::put('/perfil', [DashboardController::class, 'actualizarPerfil'])
             ->name('perfil.profesional.actualizar');
     });
@@ -140,7 +241,7 @@ Route::middleware(['auth'])->group(function () {
         [EmpresaOportunidadController::class, 'verPerfilProfesional']
     )->name('empresa.postulaciones.profesional');
 
-        Route::get(
+    Route::get(
         '/directorio/empresas',
         [DirectorioController::class, 'empresas']
     )->name('directorio.empresas.index');
@@ -150,6 +251,10 @@ Route::middleware(['auth'])->group(function () {
         [DirectorioController::class, 'empresa']
     )->name('directorio.empresas.show');
 
+    Route::put(
+        '/perfil/empresa',
+        [DashboardController::class, 'actualizarEmpresa']
+    )->name('perfil.empresa.actualizar');
 });
 
 Route::get('/vision-mision', function () {

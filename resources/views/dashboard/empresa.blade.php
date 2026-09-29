@@ -181,24 +181,6 @@
 
 
 
-        {{-- PROFESIONALES VISTOS --}}
-
-        <div class="rounded-2xl border border-white/10 bg-[#111A29] p-6">
-
-            <p class="text-xs text-white/40">
-                Profesionales vistos
-            </p>
-
-            <p class="mt-2 text-3xl font-black">
-                0
-            </p>
-
-            <p class="mt-2 text-xs text-white/40">
-                Próximamente
-            </p>
-
-        </div>
-
 
 
         {{-- CONTRATACIONES --}}
