@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@font-face {
+    font-family: 'Futura LT W01';
+    src: url('fonts/FuturaLT.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@theme {
+        --text-base: 18px;
+
+    --font-sans: 'Futura LT W01','Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-horeca-fondo: #02060D;
+    --color-horeca-dorado: #EDA100;
+    --color-horeca-titulos:#C9A44D;
+    --color-horeca-dorado2:#FBEC5D;
+    --color-horeca-gray: #D9D9D9;
+    
+}
