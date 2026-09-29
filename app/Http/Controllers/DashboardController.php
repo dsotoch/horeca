@@ -11,7 +11,7 @@ use Illuminate\Validation\Rule;
 class DashboardController extends Controller
 {
 
-    
+
     public function index()
     {
         $usuario = Auth::user();
@@ -153,16 +153,64 @@ class DashboardController extends Controller
         | VISTA
         |--------------------------------------------------------------------------
         */
+        if ($usuario->rol == "profesional") {
+            return view('dashboard.profesional', compact(
+                'usuario',
+                'profesional',
+                'membresia',
+                'porcentajePerfil',
+                'iniciales',
+                'estadoValidacion',
+                'estadisticas'
+            ));
+        } else {
+            if ($usuario->rol == "empresa") {
 
-        return view('dashboard.profesional', compact(
-            'usuario',
-            'profesional',
-            'membresia',
-            'porcentajePerfil',
-            'iniciales',
-            'estadoValidacion',
-            'estadisticas'
-        ));
+                $empresa = $usuario->empresa;
+
+                if (!$empresa) {
+                    abort(403, 'El usuario no tiene una empresa registrada.');
+                }
+
+                // Todas las oportunidades de la empresa
+                $oportunidades = $empresa->oportunidades()
+                    ->withCount('postulaciones')
+                    ->latest()
+                    ->get();
+
+                // Oportunidades activas
+                $oportunidadesActivas = $empresa->oportunidades()
+                    ->where('estado', 'publicada')
+                    ->count();
+
+                // Total de postulaciones
+                $totalPostulaciones = $empresa->oportunidades()
+                    ->withCount('postulaciones')
+                    ->get()
+                    ->sum('postulaciones_count');
+
+                // Contrataciones
+                $totalContrataciones = $empresa->oportunidades()
+                    ->withCount([
+                        'postulaciones as contrataciones_count' => function ($query) {
+                            $query->where('estado', 'seleccionado');
+                        }
+                    ])
+                    ->get()
+                    ->sum('contrataciones_count');
+
+                return view('dashboard.empresa', compact(
+                    'usuario',
+                    'empresa',
+                    'oportunidades',
+                    'oportunidadesActivas',
+                    'totalPostulaciones',
+                    'totalContrataciones'
+                ));
+
+
+            }
+        }
     }
     public function perfil()
     {

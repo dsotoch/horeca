@@ -12,8 +12,8 @@
     <title>Registro Empresa | CLUB HORECA PRO</title>
 
     @vite([
-        'resources/css/app.css',
-        'resources/js/app.js'
+    'resources/css/app.css',
+    'resources/js/app.js'
     ])
 
 </head>
@@ -30,7 +30,15 @@
 
 
     <div class="min-h-screen flex items-center justify-center px-4 py-10">
-
+        @if ($errors->any())
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            <ul class="list-disc pl-5">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
         <div class="w-full max-w-4xl">
 
 
@@ -1162,7 +1170,7 @@
                                 Acepto los términos y condiciones y autorizo
                                 el tratamiento de los datos de mi empresa
                                 para la gestión de nuestra membresía en
-                                 CLUB HORECA PRO.
+                                CLUB HORECA PRO.
 
                             </span>
 

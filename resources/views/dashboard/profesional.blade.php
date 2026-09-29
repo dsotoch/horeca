@@ -83,7 +83,7 @@
                 Completa tu perfil profesional
             </p>
 
-            <p class="mt-1 text-xs leading-5 text-white/50">
+            <p class="mt-1 text-xs leading-5 text-white/70">
                 Tu perfil está al {{ $porcentajePerfil }}%.
                 Completarlo aumentará tus posibilidades
                 de aparecer en búsquedas y recibir oportunidades.
@@ -131,7 +131,7 @@
                         COMUNIDAD PROFESIONAL HORECA
                     </p>
 
-                    <p class="text-xs text-white/50">
+                    <p class="text-xs text-white/70">
                         Gastronomía · Hotelería · Turismo
                     </p>
 
@@ -162,7 +162,7 @@
             <div class="mt-6 grid grid-cols-1 gap-3 sm:flex sm:flex-wrap">
 
                 <a
-                    href="#"
+                    href="{{route('profesional.oportunidades.index') }}"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-horeca-dorado px-5 py-3.5 text-sm font-black text-black transition hover:opacity-90">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     Explorar oportunidades

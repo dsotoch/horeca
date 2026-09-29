@@ -201,7 +201,7 @@
                         </div>
 
 
-                        <p class="mt-2 text-xs text-white/50">
+                        <p class="mt-2 text-xs text-white/70">
                             Membresía PRO Activa
                         </p>
 
@@ -303,8 +303,8 @@
                         {{-- ========================================================= --}}
 
                         <a
-                            href="#"
-                            class="group flex items-center justify-between rounded-xl px-4 py-3 flex items-center justify-between text-sm font-semibold text-white/60 transition hover:bg-white/5 hover:text-white">
+                            href="{{ auth()->user()->rol=='empresa'? route('oportunidades.index'):route('profesional.oportunidades.index') }}"
+                            class="{{ request()->routeIs('oportunidades.*')  || request()->routeIs('profesional.oportunidades.*')? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }} group flex items-center justify-between rounded-xl px-4 py-3 flex items-center justify-between text-sm font-semibold text-white/60 transition hover:bg-white/5 hover:text-white">
                             <span class="flex items-center gap-3">
                                 <i class="fa-solid fa-briefcase w-5 text-center"></i>
                                 <span>Oportunidades</span>
@@ -324,13 +324,13 @@
                         {{-- ========================================================= --}}
 
                         <a
-                            href="{{route('postulaciones.index')}}"
-                            class="{{ request()->routeIs('postulaciones.index') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }} group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold flex items-center justify-between  text-white/60 transition hover:bg-white/5 hover:text-white">
+                            href="{{auth()->user()->rol=='profesional'?route('profesional.postulaciones.index'):route('empresa.postulaciones.index')}}"
+                            class="{{ request()->routeIs('profesional.postulaciones.*') || request()->routeIs('empresa.postulaciones.*')  ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }} group flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold flex items-center justify-between  text-white/60 transition hover:bg-white/5 hover:text-white">
                             <span class="flex items-center gap-3">
                                 <i class="fa-solid fa-file-signature w-5 text-center"></i>
-                                <span>Mis postulaciones</span>
+                                <span> {{auth()->user()->rol=='profesional'?'Mis postulaciones' : 'Postulaciones'}}</span>
                             </span>
-                            
+
 
                             @if(($estadisticas['postulaciones'] ?? 0) > 0)
                             <span class="rounded-full bg-horeca-dorado/20 px-2 py-0.5 text-[10px] font-bold text-horeca-dorado">
@@ -345,9 +345,9 @@
                         {{-- DIRECTORIO --}}
                         {{-- ========================================================= --}}
 
-                        <a
-                            href="#"
-                            class="group flex items-center rounded-xl px-4 py-3 text-sm font-semibold flex items-center justify-between text-white/60 transition hover:bg-white/5 hover:text-white">
+                        <a 
+                            href="{{route('directorio.empresas.index')}}"
+                            class=" {{ request()->routeIs('directorio.empresas.*') ? 'bg-horeca-dorado text-black shadow-lg shadow-horeca-dorado/10 font-bold' : '' }}  group flex items-center rounded-xl px-4 py-3 text-sm font-semibold flex items-center justify-between text-white/60 transition hover:bg-white/5 hover:text-white">
                             <span class="flex items-center gap-3">
                                 <i class="fa-solid fa-users w-5 text-center"></i>
                                 <span>Directorio PRO</span>
@@ -409,7 +409,7 @@
                                 <span>Mi perfil</span>
                             </span>
 
-                             @if(request()->routeIs('perfil.profesional'))
+                            @if(request()->routeIs('perfil.profesional'))
                             <i class="fa-solid fa-chevron-right text-xs"></i>
                             @endif
                         </a>
@@ -506,7 +506,7 @@
                                 </p>
 
 
-                                <p class="text-[11px] text-white/50">
+                                <p class="text-[11px] text-white/70">
 
                                     {{ ucfirst($usuario->rol) }}
 

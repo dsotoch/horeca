@@ -56,4 +56,8 @@ class Profesional extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function postulaciones()
+    {
+        return $this->hasMany(Postulacion::class);
+    }
 }

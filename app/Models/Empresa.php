@@ -43,6 +43,7 @@ class Empresa extends Model
 
         'estado_validacion',
         'fecha_validacion',
+        'video_presentacion'
     ];
 
     protected $casts = [
@@ -55,8 +56,12 @@ class Empresa extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function user()
+    public function usuario()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
+    }
+    public function oportunidades()
+    {
+        return $this->hasMany(Oportunidad::class);
     }
 }
